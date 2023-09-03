@@ -1,12 +1,14 @@
-import 'package:chatting_app/main.dart';
-import 'package:chatting_app/screens/auth/login_screen.dart';
-import 'package:chatting_app/screens/home_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/cupertino.dart';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../main.dart';
+import '../apis/api.dart';
+import 'auth/login_screen.dart';
+import 'home_screen.dart';
+
+//splash screen
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -19,46 +21,48 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Future.delayed(const Duration(seconds: 2), () {
+      //exit full-screen
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
       SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
           systemNavigationBarColor: Colors.white,
           statusBarColor: Colors.white));
-      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-      if (FirebaseAuth.instance.currentUser != null) {
+
+      if (APIs.auth.currentUser != null) {
+        log('\nUser: ${APIs.auth.currentUser}');
+        //navigate to home screen
         Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => HomeScreen(),
-            ));
+            context, MaterialPageRoute(builder: (_) => const HomeScreen()));
       } else {
+        //navigate to login screen
         Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const LoginScreen(),
-            ));
+            context, MaterialPageRoute(builder: (_) => const LoginScreen()));
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    //initializing media query (for getting device screen size)
     mq = MediaQuery.of(context).size;
-    bool _isAnimated = false;
+
     return Scaffold(
+      //body
       body: Stack(children: [
+        //app logo
         Positioned(
-            top: mq.height * 0.15,
-            width: mq.width * 0.5,
-            left: mq.width * .25,
+            top: mq.height * .15,
+            right: mq.width * .25,
+            width: mq.width * .5,
             child: Image.asset('images/icon.png')),
+
+        //google login button
         Positioned(
-            bottom: mq.height * 0.15,
-            width: mq.width * 0.9,
-            child: const Text(
-              'Made by Rajeel Ansari',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontSize: 16, color: Colors.black, letterSpacing: .5),
-            )),
+            bottom: mq.height * .15,
+            width: mq.width,
+            child: const Text('MADE IN INDIA WITH ❤️',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontSize: 16, color: Colors.black87, letterSpacing: .5))),
       ]),
     );
   }
